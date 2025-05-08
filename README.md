@@ -58,7 +58,7 @@ V2ray/Xray多用户管理脚本，向导式管理[新增|删除|修改]传输协
   - VLESS_TCP
   - VLESS_TLS
   - VLESS_WS
-  - VLESS_XTLS
+  - VLESS_REALITY
   - Trojan
 
 ## 安装命令
@@ -129,7 +129,7 @@ systemctl disable firewalld.service
 ```
 
 ## 建议
-安装完v2ray后强烈建议开启BBR等加速: [Linux-NetSpeed](https://github.com/chiakge/Linux-NetSpeed)  
+安装完v2ray后强烈建议开启BBR等加速: [one_click_script](https://github.com/jinwyp/one_click_script)  
 使用Trojan和VLESS协议建议自行安装个nginx, 能让v2ray顺利Fallback到默认的80端口
 
 ## 依赖

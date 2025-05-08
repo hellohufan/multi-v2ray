@@ -38,7 +38,7 @@ class StreamModifier:
             (StreamType.VLESS_TCP, "VLESS_TCP"),
             (StreamType.VLESS_TLS, "VLESS_TLS"),
             (StreamType.VLESS_WS, "VLESS_WS"),
-            (StreamType.VLESS_XTLS, "VLESS_XTLS"),
+            (StreamType.VLESS_REALITY, "VLESS_REALITY"),
             (StreamType.VLESS_GRPC, "VLESS_GRPC"),
             (StreamType.TROJAN, "Trojan"),
         ]
@@ -75,9 +75,9 @@ class StreamModifier:
             print("")
             header = CommonSelector(header_type_list(), _("please select fake header: ")).select()
             kw = {'security': security, 'key': key, 'header': header}
-        elif sType in (StreamType.VLESS_TLS, StreamType.VLESS_WS, StreamType.VLESS_XTLS, StreamType.VLESS_GRPC):
+        elif sType in (StreamType.VLESS_TLS, StreamType.VLESS_WS, StreamType.VLESS_REALITY, StreamType.VLESS_GRPC):
             port_set = all_port()
-            if not "443" in port_set:
+            if not "443" in port_set and sType == StreamType.VLESS_TLS:
                 print()
                 print(ColorStr.yellow(_("auto switch 443 port..")))
                 gw = GroupWriter(self.group_tag, self.group_index)
@@ -86,11 +86,12 @@ class StreamModifier:
             if sType == StreamType.VLESS_WS:
                 host = input(_("please input fake domain: "))
                 kw['host'] = host
-            elif sType == StreamType.VLESS_XTLS:
-                flow_list = xtls_flow()
-                print("")
-                flow = CommonSelector(flow_list, _("please select xtls flow type: ")).select()
-                kw = {'flow': flow}
+            elif sType == StreamType.VLESS_TLS:
+                kw = {'flow': xtls_flow()[0]}
+            elif sType == StreamType.VLESS_REALITY:
+                serverName = input(_("please input reality serverName(domain): "))
+                kw = {'flow': xtls_flow()[0]}
+                kw['serverNames'] = [serverName]
             elif sType == StreamType.VLESS_GRPC and run_type == "xray":
                 choice = readchar(_("open xray grpc multiMode?(y/n): ")).lower()
                 if choice == 'y':
@@ -157,7 +158,7 @@ def modify(group=None, sType=None):
         else:
             choice = int(choice)
             if choice > 0 and choice <= len(sm.stream_type):
-                if sm.stream_type[choice - 1][1] in ("MTProto", "Shadowsocks") and group.tls in ('tls', 'xtls'):
+                if sm.stream_type[choice - 1][1] in ("MTProto", "Shadowsocks") and group.tls in ('tls', 'reality'):
                     print(_("{} MTProto/Shadowsocks not support https, close tls success!".format(run_type.capitalize())))
                 sm.select(sm.stream_type[choice - 1][0])
                 print(_("modify protocol success"))

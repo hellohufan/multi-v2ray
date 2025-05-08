@@ -3,7 +3,7 @@
 import json
 import base64
 from urllib.parse import quote
-from .utils import ColorStr
+from .utils import ColorStr, x25519_key
 
 __author__ = 'Jrohy'
 
@@ -98,7 +98,7 @@ class Socks(User):
         return "socks"
 
 class Vless(User):
-    def __init__(self, uuid, user_number, encryption=None, email=None, network=None, path=None, host=None, header=None, flow="", serviceName="", mode=""):
+    def __init__(self, uuid, user_number, encryption=None, email=None, network=None, path=None, host=None, header=None, flow="", serviceName="", mode="", serverName="", privateKey="", shortId=""):
         super(Vless, self).__init__(user_number, uuid, email)
         self.encryption = encryption
         self.path = path
@@ -108,6 +108,9 @@ class Vless(User):
         self.flow = flow
         self.serviceName = serviceName
         self.mode = mode
+        self.serverName = serverName
+        self.privateKey = privateKey
+        self.shortId = shortId
 
     def __str__(self):
         email = ""
@@ -140,8 +143,10 @@ Network: {network}
         result_link = "vless://{s.password}@{ip}:{port}?encryption={s.encryption}".format(s=self, ip=ip, port=port)
         if tls == "tls":
             result_link += "&security=tls"
-        elif tls == "xtls":
-            result_link += "&security=xtls&flow={}".format(self.flow)
+            if self.flow:
+                result_link += "&flow={}".format(self.flow)
+        elif tls == "reality":
+            result_link += "&security=reality&fp=chrome&flow={}&sni={}&pbk={}&sid={}".format(self.flow, self.serverName, x25519_key(self.privateKey)[1], self.shortId)
         if self.network == "ws":
             result_link += "&type=ws&host={0}&path={1}".format(self.host, quote(self.path))
         elif self.network == "tcp":
@@ -240,8 +245,8 @@ class Group:
         node = self.node_list[index]
         if self.tls == "tls":
             tls = _("open")
-        elif self.tls == "xtls":
-            tls = "xtls {0}, flow: {1}".format(_("open"), node.flow)
+        elif self.tls == "reality":
+            tls = "serverName: {0}, flow: {1}, publicKey: {2}, shortId: {3}".format(node.serverName, node.flow, x25519_key(node.privateKey)[1], node.shortId)
         else:
             tls = _("close")
         result = '''
@@ -264,8 +269,10 @@ TLS: {tls}
         port_way = "-{}".format(self.end_port) if self.end_port else ""
         if self.tls == "tls":
             tls = _("open")
-        elif self.tls == "xtls":
-            tls = "xtls {0}, flow: {1}".format(_("open"), self.node_list[0].flow)
+            if hasattr(self.node_list[0], "flow"):
+                tls += " flow: {}".format(self.node_list[0].flow)
+        elif self.tls == "reality":
+            tls = "reality serverName: {0}, flow: {1}, publicKey: {2}, shortId: {3}".format(self.node_list[0].serverName, self.node_list[0].flow, x25519_key(self.node_list[0].privateKey)[1], self.node_list[0].shortId)
         else:
             tls = _("close")
         result = ""

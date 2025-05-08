@@ -78,7 +78,7 @@ class StreamType(Enum):
     VLESS_TLS = 'vless_tls'
     VLESS_WS = 'vless_ws'
     VLESS_GRPC = 'vless_grpc'
-    VLESS_XTLS = 'vless_xtls'
+    VLESS_REALITY = 'vless_reality'
     TROJAN = 'trojan'
 
 def header_type_list():
@@ -88,7 +88,7 @@ def ss_method():
     return ("aes-256-gcm", "aes-128-gcm", "chacha20-poly1305")
 
 def xtls_flow():
-    return ("xtls-rprx-direct", "xtls-rprx-origin")
+    return ("xtls-rprx-vision", "none")
 
 def get_ip():
     """
@@ -254,6 +254,13 @@ def clean_iptables(port):
     output_result = os.popen(check_cmd % (iptable_way, "OUTPUT", str(port))).readlines()
     for line in output_result:
         os.system(clean_cmd.format(iptable_way, "OUTPUT", str(line)))
+
+def x25519_key(private_key=None):
+    gen_cmd="/usr/bin/xray/xray x25519"
+    if private_key:
+        gen_cmd = "{} -i '{}'".format(gen_cmd, private_key)
+    gen_result = os.popen(gen_cmd + "|awk -F ':' '{print $2}'|sed 's/ //g'").readlines()
+    return list(map(lambda x: x.strip(), gen_result))
 
 def all_port():
     from .loader import Loader

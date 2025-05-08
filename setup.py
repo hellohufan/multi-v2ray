@@ -13,7 +13,7 @@ setup(
     description="a tool to manage v2ray config json",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    keywords='python v2ray multi-v2ray vmess socks5 vless trojan xray xtls',
+    keywords='python v2ray multi-v2ray vmess socks5 vless trojan xray xtls reality',
     author='Jrohy',
     author_email='euvkzx@gmail.com',
     url='https://github.com/Jrohy/multi-v2ray',
@@ -41,5 +41,6 @@ setup(
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
     ]
 )

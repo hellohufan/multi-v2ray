@@ -85,11 +85,8 @@ def new_user():
                 if password == "":
                     password = random_pass
                 info['password'] = password
-            elif type(group.node_list[0]) == Vless and group.tls == "xtls":
-                flow_list = xtls_flow()
-                print("")
-                flow = CommonSelector(flow_list, _("please select xtls flow type: ")).select()
-                info['flow'] = flow
+            elif type(group.node_list[0]) == Vless and group.tls == "reality":
+                info['flow'] = xtls_flow()[0]
             nw.create_new_user(**info)
             return True
 
